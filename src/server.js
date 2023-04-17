@@ -1,9 +1,6 @@
 require("express-async-errors");
 const AppError = require("./utils/AppError");
 
-const database = require("./database/sqlite");
-database();
-
 const express = require("express");
 const app = express();
 app.use(express.json());
@@ -18,6 +15,8 @@ app.use((err, req, res, next) => {
       message: err.message
     });
   };
+
+  console.log(err)
 
   return res.status(500).json({
     status: "error",
