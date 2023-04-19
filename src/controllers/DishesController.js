@@ -23,7 +23,7 @@ class DishesController {
 
     await knex("ingredients").insert(ingredientsInsert);
 
-    return res.json();
+    return res.json("Prato criado com sucesso.");
   }
 
   async update(req, res) {
@@ -44,7 +44,8 @@ class DishesController {
       name: dish.name,
       price: dish.price,
       description: dish.description,
-      category: dish.category
+      category: dish.category,
+      updated_at: knex.fn.now()
     })
 
     const ingredientsInsert = ingredients.map(ingredient => {
@@ -58,7 +59,20 @@ class DishesController {
 
     await knex("ingredients").insert(ingredientsInsert);
 
-    return res.json();
+    return res.json("As alterações foram salvar com sucesso.");
+  }
+
+  async delete(req, res) {
+    const { id } = req.params;
+
+    const dish = await knex("dishes").where({ id }).first();
+    if (!dish) {
+      throw new AppError("O prato não foi encontrado.");
+    }
+
+    await knex("dishes").where({ id }).delete();
+
+    return res.json("O prato foi excluído com sucesso.");
   }
 }
 
