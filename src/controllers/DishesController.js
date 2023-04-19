@@ -17,7 +17,7 @@ class DishesController {
     const ingredientsInsert = ingredients.map(ingredient => {
       return {
         dishes_id,
-        name: ingredient
+        title: ingredient
       }
     });
 
@@ -36,9 +36,9 @@ class DishesController {
     }
     
     dish.name = name ?? dish.name;
-    dish.name = price ?? dish.price;
-    dish.name = description ?? dish.description;
-    dish.name = category ?? dish.category;
+    dish.price = price ?? dish.price;
+    dish.description = description ?? dish.description;
+    dish.category = category ?? dish.category;
 
     await knex("dishes").where({ id }).update({
       name: dish.name,
@@ -51,7 +51,7 @@ class DishesController {
     const ingredientsInsert = ingredients.map(ingredient => {
       return {
         dishes_id: id,
-        name: ingredient
+        title: ingredient
       }
     })
 
@@ -73,6 +73,27 @@ class DishesController {
     await knex("dishes").where({ id }).delete();
 
     return res.json("O prato foi excluído com sucesso.");
+  }
+
+  async show(req, res) {
+    const { id } = req.params;
+
+    const dish = await knex("dishes").where({ id }).first();
+    if (!dish) {
+      throw new AppError("O prato não foi encontrado.");
+    }
+
+    return res.json(dish);
+  }
+
+  async showAll(req, res) {
+    const { name } = req.query;
+
+    const dishes = await knex("ingredients").select([ "dishes.id", "dishes.name", "dishes.price", "dishes.description", "dishes.category", "dishes.image", "ingredients.title" ])
+      .whereLike("dishes.name", `%${ name }%`)
+      .innerJoin("dishes", "dishes.id", "ingredients.dishes_id");
+
+    return res.json(dishes)
   }
 }
 
