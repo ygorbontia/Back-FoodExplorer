@@ -33,7 +33,7 @@ class UserController {
   };
 
   async update(req, res) {
-    const { id } = req.params;
+    const { id } = req.user.id;
     const { name, email, currentPassword, newPassword } = req.body;
 
     const user = await knex("user").where({ id }).first();
@@ -73,7 +73,7 @@ class UserController {
   };
 
   async delete(req, res) {
-    const { id } = req.params;
+    const { id } = req.user.id;
 
     const user = await knex("user").where({ id }).first();
     if (!user) {
