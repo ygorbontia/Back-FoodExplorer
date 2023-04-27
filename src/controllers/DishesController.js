@@ -1,30 +1,30 @@
 const AppError = require("../utils/AppError");
 const knex = require("../database/knex");
-// const DiskStorage = require("../providers/DiskStorage");
+const DiskStorage = require("../providers/DiskStorage");
 
 class DishesController {
   async create(req, res) {
     const user_id = req.user.id;
     const { name, price, description, category, ingredients } = req.body;
-    // const dishFilename = req.file.filename;
-    // const diskStorage = new DiskStorage();
+    const dishFilename = req.file.filename;
+    const diskStorage = new DiskStorage();
 
     if (!dishFilename) {
       throw new AppError("A imagem é um campo obrigatório!");
     }
     
-    // const filename = await diskStorage.save(dishFilename);
+    const filename = await diskStorage.save(dishFilename);
 
     const [ dishes_id ] = await knex("dishes").where({ user_id }).insert({
       user_id,
       name,
       price,
       description,
-      // image: filename,
+      image: filename,
       category
     });
 
-    const ingredientsInsert = ingredients.map(ingredient => {
+    const ingredientsInsert = ingredients[0].split(",").map(ingredient => {
       return {
         dishes_id,
         title: ingredient
@@ -38,37 +38,37 @@ class DishesController {
 
   async update(req, res) {
     const { id } = req.params;
-    const { name, price, description, image, category, ingredients } = req.body;
-    // const dishFilename = req.file.filename;
-    // const diskStorage = new DiskStorage();
+    const { name, price, description, category, ingredients } = req.body;
+    const dishFilename = req.file.filename;
+    const diskStorage = new DiskStorage();
 
     const dish = await knex("dishes").where({ id }).first();
     if (!dish) {
       throw new AppError("O prato não foi encontrado.");
     }
 
-    // if (image) {
-    //   await diskStorage.delete(dish.avatar)
-    //   const filename = await diskStorage.save(dishFilename);
-    //   dish.image = filename;
-    // }
+    if (dishFilename) {
+      await diskStorage.delete(dish.image);
+      const filename = await diskStorage.save(dishFilename);
+      dish.image = filename;
+    }
     
     dish.name = name ?? dish.name;
     dish.price = price ?? dish.price;
     dish.description = description ?? dish.description;
-    // dish.image,
+    dish.image,
     dish.category = category ?? dish.category;
 
     await knex("dishes").where({ id }).update({
       name: dish.name,
       price: dish.price,
       description: dish.description,
-      // image: dish.image,
+      image: dish.image,
       category: dish.category,
       updated_at: knex.fn.now()
     })
 
-    const ingredientsInsert = ingredients.map(ingredient => {
+    const ingredientsInsert = ingredients[0].split(",").map(ingredient => {
       return {
         dishes_id: id,
         title: ingredient
@@ -118,7 +118,6 @@ class DishesController {
       dishes = await knex("ingredients").select([ "dishes.id", "dishes.name", "dishes.price", "dishes.description", "dishes.category", "dishes.image", "ingredients.title" ])
         .innerJoin("dishes", "dishes.id", "ingredients.dishes_id");
     }
-
 
     return res.json(dishes)
   }
