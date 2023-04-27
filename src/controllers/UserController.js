@@ -13,7 +13,7 @@ class UserController {
 
     const hashedPassword = await hash(password, 8);
 
-    if (admin) {
+    if (admin == true) {
       await knex("user").insert({
         name,
         email,
@@ -33,10 +33,10 @@ class UserController {
   };
 
   async update(req, res) {
-    const { id } = req.user.id;
+    const user_id = req.user.id;
     const { name, email, currentPassword, newPassword } = req.body;
 
-    const user = await knex("user").where({ id }).first();
+    const user = await knex("user").where({ id: user_id }).first();
     if (!user) {
       throw new AppError("Usuário não encontrado.");
     }
@@ -62,7 +62,7 @@ class UserController {
       user.password = await hash(newPassword, 8);
     }
 
-    await knex("user").where({ id }).update({
+    await knex("user").where({ id: user_id }).update({
       name: user.name,
       email: user.email,
       password: user.password,
@@ -73,14 +73,20 @@ class UserController {
   };
 
   async delete(req, res) {
-    const { id } = req.user.id;
+    const user_id = req.user.id;
+    const { password } = req.body;
 
-    const user = await knex("user").where({ id }).first();
+    const user = await knex("user").where({ id: user_id }).first();
     if (!user) {
       throw new AppError("Usuário não encontrado.");
     };
 
-    await knex("user").where({ id }).delete();
+    const validadePassword = await compare(password, user.password);
+    if (!validadePassword) {
+      throw new AppError("Senha incorreta.");
+    }
+
+    await knex("user").where({ id: user_id }).delete();
 
     return res.json("Usuário excluído com sucesso.");
   }

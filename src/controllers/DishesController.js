@@ -3,7 +3,7 @@ const knex = require("../database/knex");
 
 class DishesController {
   async create(req, res) {
-    const { user_id } = req.params;
+    const user_id = req.user.id;
     const { name, price, description, category, ingredients } = req.body;
 
     const [ dishes_id ] = await knex("dishes").where({ user_id }).insert({
@@ -88,10 +88,17 @@ class DishesController {
 
   async showAll(req, res) {
     const { name } = req.query;
+    let dishes
 
-    const dishes = await knex("ingredients").select([ "dishes.id", "dishes.name", "dishes.price", "dishes.description", "dishes.category", "dishes.image", "ingredients.title" ])
-      .whereLike("dishes.name", `%${ name }%`)
-      .innerJoin("dishes", "dishes.id", "ingredients.dishes_id");
+    if (name) {
+      dishes = await knex("ingredients").select([ "dishes.id", "dishes.name", "dishes.price", "dishes.description", "dishes.category", "dishes.image", "ingredients.title" ])
+        .whereLike("dishes.name", `%${ name }%`)
+        .innerJoin("dishes", "dishes.id", "ingredients.dishes_id");
+    } else {
+      dishes = await knex("ingredients").select([ "dishes.id", "dishes.name", "dishes.price", "dishes.description", "dishes.category", "dishes.image", "ingredients.title" ])
+        .innerJoin("dishes", "dishes.id", "ingredients.dishes_id");
+    }
+
 
     return res.json(dishes)
   }
