@@ -24,14 +24,17 @@ class DishesController {
       category
     });
 
-    const ingredientsInsert = ingredients[0].split(",").map(ingredient => {
-      return {
-        dishes_id,
-        title: ingredient
-      }
-    });
 
-    await knex("ingredients").insert(ingredientsInsert);
+    if (ingredients !== undefined) {
+      const ingredientsInsert = ingredients.map(ingredient => {
+        return {
+          dishes_id,
+          title: ingredient
+        }
+      });
+
+      await knex("ingredients").insert(ingredientsInsert);
+    }
 
     return res.json("Prato criado com sucesso.");
   }
