@@ -24,7 +24,6 @@ class DishesController {
       category
     });
 
-
     if (ingredients !== undefined) {
       const ingredientsInsert = ingredients.map(ingredient => {
         return {
