@@ -124,8 +124,7 @@ class DishesController {
         .whereLike("dishes.name", `%${ name }%`)
         .innerJoin("dishes", "dishes.id", "ingredients.dishes_id");
     } else {
-      dishes = await knex("ingredients").select([ "dishes.id", "dishes.name", "dishes.price", "dishes.description", "dishes.category", "dishes.image", "ingredients.title" ])
-        .innerJoin("dishes", "dishes.id", "ingredients.dishes_id");
+      dishes = await knex("dishes");
     }
 
     return res.json(dishes)
