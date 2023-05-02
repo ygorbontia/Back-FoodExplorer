@@ -50,6 +50,7 @@ class DishesController {
   async update(req, res) {
     const { id } = req.params;
     const { name, price, description, category, ingredients } = req.body;
+    const dishIngredients = JSON.parse(ingredients);
 
     const dish = await knex("dishes").where({ id }).first();
     if (!dish) {
@@ -62,7 +63,7 @@ class DishesController {
   
       if (dishFilename) {
         await diskStorage.delete(dish.image);
-        const filename = await diskStorage.saveFile(dishFilename);
+        const filename = await diskStorage.save(dishFilename);
         dish.image = filename;
       }
     }
@@ -82,7 +83,7 @@ class DishesController {
       updated_at: knex.fn.now()
     })
 
-    const ingredientsInsert = ingredients[0].split(",").map(ingredient => {
+    const ingredientsInsert = dishIngredients.map(ingredient => {
       return {
         dishes_id: id,
         title: ingredient
