@@ -24,21 +24,23 @@ class DishesController {
       category
     });
 
-    if (ingredients.length >= 0) {
-      if (Array.isArray(ingredients)) {
-        const ingredientsInsert = ingredients.map(ingredient => {
-          return {
-            dishes_id,
-            title: ingredient
-          }
-        });
+    if (ingredients) {
+      if (ingredients.length >= 0) {
+        if (Array.isArray(ingredients)) {
+          const ingredientsInsert = ingredients.map(ingredient => {
+            return {
+              dishes_id,
+              title: ingredient
+            }
+          });
 
-        await knex("ingredients").insert(ingredientsInsert);
-      } else {
-        await knex("ingredients").insert({
-          dishes_id,
-          title: ingredients
-        })
+          await knex("ingredients").insert(ingredientsInsert);
+        } else {
+          await knex("ingredients").insert({
+            dishes_id,
+            title: ingredients
+          })
+        }
       }
     }
 
@@ -58,7 +60,7 @@ class DishesController {
 
     if (dishFilename) {
       await diskStorage.delete(dish.image);
-      const filename = await diskStorage.save(dishFilename);
+      const filename = await diskStorage.saveFile(dishFilename);
       dish.image = filename;
     }
     
