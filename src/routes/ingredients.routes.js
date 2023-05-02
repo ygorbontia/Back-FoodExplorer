@@ -4,8 +4,6 @@ const ingredientsRoutes = Router();
 const IngredientsController = require("../controllers/IngredientsController");
 const ingredientsController = new IngredientsController();
 
-const ensureAuthentication = require("../middlewares/ensureAuthentication");
-
-ingredientsRoutes.get("/:id", ensureAuthentication, ingredientsController.showAll);
+ingredientsRoutes.get("/:dishes_id", ingredientsController.showAll);
 
 module.exports = ingredientsRoutes;

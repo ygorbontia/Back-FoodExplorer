@@ -50,18 +50,21 @@ class DishesController {
   async update(req, res) {
     const { id } = req.params;
     const { name, price, description, category, ingredients } = req.body;
-    const dishFilename = req.file.filename;
-    const diskStorage = new DiskStorage();
 
     const dish = await knex("dishes").where({ id }).first();
     if (!dish) {
       throw new AppError("O prato não foi encontrado.");
     }
 
-    if (dishFilename) {
-      await diskStorage.delete(dish.image);
-      const filename = await diskStorage.saveFile(dishFilename);
-      dish.image = filename;
+    if (req.file) {
+      const dishFilename = req.file.filename;
+      const diskStorage = new DiskStorage();
+  
+      if (dishFilename) {
+        await diskStorage.delete(dish.image);
+        const filename = await diskStorage.saveFile(dishFilename);
+        dish.image = filename;
+      }
     }
     
     dish.name = name ?? dish.name;
