@@ -29,9 +29,13 @@ O **admin** pode realizar algumas funções dentro da aplicação, como visualiz
 
 ## Acessos
 **User**
+
 *E-mail:* user@email.com
+
 *Senha:* 123
  
 **Admin**
+
 *E-mail:* admin@email.com
+
 *Senha:* 123
