@@ -128,7 +128,8 @@ class DishesController {
     if (name) {
       dishes = await knex("ingredients").select([ "dishes.id", "dishes.name", "dishes.price", "dishes.description", "dishes.category", "dishes.image", "ingredients.title" ])
         .whereLike("dishes.name", `%${ name }%`)
-        .innerJoin("dishes", "dishes.id", "ingredients.dishes_id");
+        .innerJoin("dishes", "dishes.id", "ingredients.dishes_id")
+        .groupBy("dishes.id");
     } else {
       dishes = await knex("dishes");
     }
